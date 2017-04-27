@@ -94,6 +94,13 @@ var InitProg = function(){
 	// #### criando os pontos, indices e cores #####
 
 	var points = [];
+	// pentagrama externo
+	for (var i = 0; i<5; i++){
+		points.push(Math.sin((i*Math.PI*72)/180), Math.cos((i*Math.PI*72)/180));
+		//points.push(Math.cos((i*Math.PI*72)/180));
+	
+	}
+	//pentagrama interno
 	for (var i = 0; i<5; i++){
 		points.push(Math.sin((i*Math.PI*72)/180), Math.cos((i*Math.PI*72)/180));
 		//points.push(Math.cos((i*Math.PI*72)/180));
@@ -101,33 +108,36 @@ var InitProg = function(){
 	}
 
 	var indices =[
+	/*/interno 
 		0, 3,
 		0, 2,
 		1, 4,
 		1, 3,
 		2, 4,
-		0, 1,
-		1, 2,
-		2, 3,
-		3, 4,
-		4, 0
+	//externo
+		5, 6,
+		6, 7,
+		7, 8,
+		8, 9,
+		9, 10
+			*/
+		0, 1 , 2, 3, 4, 0, 5, 8, 6, 9, 7, 5
 	];
 
 	var lineColors = [
-		1.0, 1.0, 0.3,	 	1.0, 1.0, 0.3,
-		1.0, 1.0, 0.3, 		1.0, 1.0, 0.3,
-		1.0, 1.0, 0.3, 		1.0, 1.0, 0.3,
-		1.0, 1.0, 0.3, 		1.0, 1.0, 0.3,
-		1.0, 1.0, 0.3, 		1.0, 1.0, 0.3,
-
-		0.0, 0.8, 0.32, 	0.0, 0.8, 0.32,
-		0.0, 0.8, 0.32, 	0.0, 0.8, 0.32,
-		0.0, 0.8, 0.32, 	0.0, 0.8, 0.32,
-		0.0, 0.8, 0.32, 	0.0, 0.8, 0.32,
-		0.0, 0.8, 0.32, 	0.0, 0.8, 0.32		
-	];
-
+		1.0, 1.0, 0.3, 	 	
+		1.0, 1.0, 0.3,
+		1.0, 1.0, 0.3, 		
+		1.0, 1.0, 0.3,
+		1.0, 1.0, 0.3,
 	
+
+		1.0, 0.0, 0.3,
+		1.0, 0.0, 0.3,
+		1.0, 0.0, 0.3,
+		1.0, 0.0, 0.3,
+		1.0, 0.0, 0.3 	
+	];
 
 
 	//PONTOS
@@ -139,19 +149,16 @@ var InitProg = function(){
 	var indicesBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer);
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-
+	gl.vertexAttribPointer( positionAttribLocation, 2, gl.FLOAT, gl.FALSE, 0,0 );
 	//CORES
 	var colorBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lineColors), gl.STATIC_DRAW);
-
-	//pointers
-	gl.vertexAttribPointer( positionAttribLocation, 2, gl.FLOAT, gl.FALSE, 0,0 );
 	gl.vertexAttribPointer( colorAttribLocation, 3 , gl.FLOAT, gl.FALSE, 0, 0);
 
 		
 		
 	gl.useProgram(program);
-	gl.drawElements(gl.LINES, 20, gl.UNSIGNED_SHORT, 0);
+	gl.drawElements(gl.LINE_LOOP, 12, gl.UNSIGNED_SHORT, 0);
 
 	};

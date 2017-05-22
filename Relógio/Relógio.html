@@ -1,0 +1,271 @@
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+			</head>
+
+
+			<body>
+				<header>
+			
+					<title>Relógio</title>
+				</header>
+
+
+			<h2>Relógio Funcionando</h2>
+			<p >Alunos: Danillo Lobo Ferraz </br> Marcos Antonio de Jesus Filho</p>
+			<canvas id="canvas-id" style="border:1px solid black" width="500" height="500">O browser não suporta a <i>tag</i> HTML canvas.</canvas>
+
+			<p id="message"></p>
+
+		<script id="shader-vs" type="x-shader/x-vertex">
+		attribute vec3 pos;
+
+		uniform mat4 transf;
+
+		void main()
+		{
+			gl_Position = transf*vec4(pos, 1.);
+		}
+		</script>
+			
+		<script id="shader-fs" type="x-shader/x-fragment">
+		precision highp float;
+				
+		uniform vec4 color;
+
+		void main()
+		{
+			gl_FragColor = color;
+		}
+		</script>
+			
+		<script src="./transformacoes/shader.js"></script>
+		<script src="./transformacoes/buffer.js"></script>
+		<script src="./gl-matrix-min.js"></script>
+
+
+		<script>
+		function init_webgl(canvas)
+		{
+			var gl = canvas.getContext("webgl");
+			if ( !gl )
+				throw Error("WebGL não é suportado pelo seu browser");
+				
+			gl.clearColor(0, 0, 0, 1);
+			
+			return gl;
+		}
+
+
+		function drawA(gl, program, form, quant, cor)
+		{
+			gl.uniform4fv(program.color, cor);
+
+			var rotacao = mat4.create();
+			
+			//Isso aqui so serve pra gerar uma matrix Identidade e
+			//nao fazer transformacao nenhuma
+			mat4.rotateZ(rotacao, rotacao, glMatrix.toRadian(0));
+
+			gl.uniformMatrix4fv(program.transf, false, rotacao);
+			
+			gl.drawArrays(form, 0, quant);
+		}
+
+
+
+		/* Faz o mesmo que draw porem com transformacao. A transformacao esta
+		estatica ainda. Tenho que colocar uma variavel que recebe a transformacao
+		.*/
+		function drawAT(gl, program, form, quant, color, angle)
+		{
+			
+			gl.uniform4fv(program.color, color);
+			
+			var rotacao = mat4.create();
+			
+			mat4.rotateZ(rotacao, rotacao, glMatrix.toRadian(angle));
+
+			gl.uniformMatrix4fv(program.transf, false, rotacao);
+				
+			gl.drawArrays(form, 0, quant);
+		}
+
+		 var last = 0;
+		 function updateAngle(angle, ponteiroTipo) {
+		    var now = Date.now();
+		    // how many milliseconds have passed; we must use this because the time
+		    // between animation steps may be different.
+		    var time = now - last;
+		    last = now;
+		    // return the new return angle given how many seconds have passed
+		    // % 360 to ensure the angle is < 360 degrees.
+		    if(ponteiroTipo === "segundos"){
+		    return (angle + (5 * time) / 1000.0) % 360;
+			}
+			if(ponteiroTipo === "minutos"){
+			return (angle + (5* time) / 1000.0) % 360;
+			}
+			if(ponteiroTipo === "horas"){
+			return (angle + (5 * time) / 1000.0) % 360;
+			}
+		  }
+
+
+
+		var message = document.getElementById("message");
+		try
+		{
+			var canvas = document.getElementById("canvas-id");
+			var gl = init_webgl(canvas);
+
+			var prog = new Program(gl, "shader-vs", "shader-fs");
+			prog.get_locations(["pos"], ["color", "transf"]);
+			prog.use();
+
+			var i;
+
+			var branco = [1.0,1.0,1.0,1.0];	
+			var amarelo = [1.0, 1.0 , 0., 1.0];
+			var vermelho = [1.0, 0.0, 0.0, 1.0];
+			var azul = [0.0, 0.0, 1.0, 1.0];
+			var circulo = [];
+			for (i = 0; i<100; i++){
+				circulo.push(0.9*Math.sin((i*Math.PI*3.6)/180));
+				circulo.push(0.9*Math.cos((i*Math.PI*3.6)/180));	
+				circulo.push(0.);
+			}
+
+				
+			var vboA = new Array_Buffer(gl, circulo);
+			vboA.stride = 0;
+			vboA.attribute_offset [0];
+
+
+
+			
+			
+			var minMark = [];
+			for(var i =0; i< 60; i++){
+					minMark.push(0.85*Math.sin((i*Math.PI*6)/180)); 
+					minMark.push(0.85*Math.cos((i*Math.PI*6)/180));
+					minMark.push(0.);
+					minMark.push(0.80*Math.sin((i*Math.PI*6)/180));
+					minMark.push(0.80*Math.cos((i*Math.PI*6)/180));
+					minMark.push(0.);
+				}
+
+			var vboB = new Array_Buffer(gl, minMark);
+			vboB.stride = 0;
+			vboB.attribute_offset [0];
+
+
+			
+			
+			var hourMark = [];
+			for (var i = 0; i<12; i++){
+					hourMark.push(0.75*Math.sin((i*Math.PI*30)/180));
+					hourMark.push(0.75*Math.cos((i*Math.PI*30)/180));
+					hourMark.push(0.);
+					hourMark.push(0.60*Math.sin((i*Math.PI*30)/180));
+					hourMark.push(0.60*Math.cos((i*Math.PI*30)/180));
+					hourMark.push(0.);
+				}
+
+			var vboC = new Array_Buffer(gl, hourMark);
+			vboC.stride = 0;
+			vboC.attribute_offset [0];
+
+
+			
+			var hourPointer = [
+				0.0, 0.02,0.,
+				0.55, 0.02,0., //HORA
+				0.0, -0.02,0.,
+				0.55, 0.02,0.,
+				0.0, -0.02,0.,
+				0.55, -0.02,0.
+			];
+
+
+			var vboD = new Array_Buffer(gl, hourPointer);
+			vboD.stride = 0;
+			vboD.attribute_offset [0];
+
+
+			
+			
+			var minPointer = [
+					-0.02, 0.0,0., 
+				-0.02, 0.8,0., //MINUTO
+				0.02, 0.8,0.,
+				-0.02, 0.0,0.,
+				0.02, 0.8,0.,
+				0.02, 0.0,0.
+			];
+
+
+			var vboE = new Array_Buffer(gl, minPointer);
+			vboE.stride = 0;
+			vboE.attribute_offset [0];
+
+			
+			
+
+			var segPointer = [
+				0.0, 0.0,0.,
+				0.0, 0.8,0.
+			];
+
+			var vboF = new Array_Buffer(gl, segPointer);
+			vboF.stride = 0;
+			vboF.attribute_offset [0];
+
+
+
+			var angleSec = 0;
+			var angleMin = 0;
+			var angleHor = 0;
+			var tick = function() {
+				
+				var d = new Date();
+				var s = - (6 * d.getSeconds());
+				var m = - (6 * d.getMinutes()) + s/60;
+				var h = 90 - (30 * (d.getHours() % 12)) + m/12;
+					
+				gl.clear(gl.COLOR_BUFFER_BIT); 
+				vboA.bind(prog);
+				drawA(gl, prog, gl.LINE_LOOP, 100,azul);
+				vboB.bind(prog);
+				drawA(gl, prog, gl.LINES, 120,branco);
+				vboC.bind(prog);
+				drawA(gl, prog, gl.LINES, 24,branco);
+
+				
+				vboD.bind(prog);
+				drawAT(gl, prog, gl.TRIANGLES, 6, amarelo, h);
+
+				vboE.bind(prog);
+				drawAT(gl, prog, gl.TRIANGLES, 6, branco, m);
+		      
+				vboF.bind(prog);
+			  	drawAT(gl, prog, gl.LINES, 2, vermelho, s);
+
+		      requestAnimationFrame(tick);
+		    };
+				requestAnimationFrame(tick);
+		   
+
+
+
+			
+		} catch(e) {
+			message.innerHTML = e.message;
+		}
+		</script>
+
+
+
+		</body>
+	</html>

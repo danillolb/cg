@@ -1,0 +1,140 @@
+
+<!DOCTYPE html>
+<!-- saved from url=(0071)http://www.emc.ufg.br/~badan/public/webgl/transformacoes/esqueleto.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body><header>
+	
+	<title>Transformações</title>
+</header>
+
+
+	<h2>Transformações Básicas</h2>
+	<p>Modificando os objetos através de Transformações do tipo escala, translação e rotação. Animações também são contempladas.</p>
+	<canvas id="canvas-id" style="border:1px solid black" width="500" height="500">O browser não suporta a <i>tag</i> HTML canvas.</canvas>
+
+	<p id="message"></p>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+//coordenada do ponto
+attribute vec3 pos;
+//cor do ponto
+attribute vec3 color;
+//cor do ponto no fragment shader
+varying vec3 fragColor;
+//matriz de transformação
+uniform mat4 transf;
+
+
+void main()
+{
+	gl_Position = transf * vec4(pos, 1.);
+	fragColor = color;
+}
+</script>
+	
+<script id="shader-fs" type="x-shader/x-fragment">
+precision highp float;
+
+varying vec3 fragColor;
+
+void main()
+{
+	gl_FragColor = vec4(fragColor, 1.0);
+}
+</script>
+	
+<script src="lib/shader.js"></script>
+<script src="lib/buffer.js"></script>
+<script src="lib/gl-matrix-min.js"></script>
+
+
+<script>
+function init_webgl(canvas)
+{
+	var gl = canvas.getContext("webgl");
+	if ( !gl )
+		throw Error("WebGL não é suportado pelo seu browser");
+		
+	gl.clearColor(0, 0, 0, 1);
+	
+	return gl;
+}
+
+
+var angle = 0;
+
+function draw(gl, program, object, delta)
+{
+	/*
+	angle += (360/2)*delta;
+	angle %= 360;
+	gl.uniform4fv(program.color, [1, 1, 1, 1]);
+	
+	var rotacao = mat4.create();
+	
+	mat4.rotateZ(rotacao, rotacao, glMatrix.toRadian(angle));
+	mat4.translate(rotacao, rotacao, [0, Math.cos(Math.random(angle)), 1]);
+	mat4.scale(rotacao, rotacao, [0.5, 0.5, 0.5]);
+	
+	gl.uniformMatrix4fv(program.transf, false, rotacao);
+	*/
+	
+	object.bind(program);
+	gl.drawArrays(gl.LINE_LOOP, 0,100);
+}
+
+var message = document.getElementById("message");
+try
+{
+	var canvas = document.getElementById("canvas-id");
+	var gl = init_webgl(canvas);
+
+	var prog = new Program(gl, "shader-vs", "shader-fs");
+	prog.get_locations(["pos"], ["color", "transf"]);
+	prog.use();
+
+	var borderColor = [];
+	for(var i  = 0 ; i< 100; i ++){
+		borderColor.push(1.0, 0.0, 1.0);
+	}
+
+	
+	var circulo = [];
+	for (var i = 0; i<100; i++){
+		circulo.push(0.9*Math.sin((i*Math.PI*3.6)/180), 0.9*Math.cos((i*Math.PI*3.6)/180),0.0, borderColor[i]);	
+	}
+
+	var vbo = new Array_Buffer(gl, circulo);
+	vbo.stride = 6*4;
+	vbo.attribute_offset [3*4];
+	vbo.bind(prog);
+	
+
+	
+		
+	gl.clear(gl.COLOR_BUFFER_BIT);
+	draw(gl, prog, vbo, 0);
+	
+	/*
+	var prev = 0;
+	var animation = function(time){
+	
+		time *= 0.001;
+		var delta = time - prev;
+		prev = time;
+		
+		
+		//funcao que desenha a estrela, ela que alteraremos
+		draw(gl, prog, star, delta)
+		requestAnimationFrame(animation);
+	}
+	
+	requestAnimationFrame(animation);*/
+	
+} catch(e) {
+	message.innerHTML = e.message;
+}
+</script>
+
+
+
+</body></html>

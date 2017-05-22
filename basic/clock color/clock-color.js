@@ -6,7 +6,7 @@ vertexShaderText =
 'uniform mat4 transf;',
 'void main()',
 '{',
-'	gl_Position = transf * vec4(vertPosition, 0.0, 1.0);',
+'	gl_Position = vec4(vertPosition, 0.0, 1.0);',
 '	fragColor = colorPosition;',
 '}'
 ].join('\n');

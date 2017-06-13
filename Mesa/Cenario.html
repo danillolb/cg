@@ -6,7 +6,7 @@
 </header>
 
 <body>
-	<h2>Básico para movimentação de câmera: <i>Scene Graph</i> - Sistema Sol - Terra - Lua</h2>
+	<h2>Básico para movimentação de câmera: <i>Scene Graph</i> - Mesa com Objetos</h2>
 	<p>Usando o teclado e o mouse para movimentação da câmera.</p>
 	<canvas id="canvas-id" style="border:1px solid black;display:inline-block;" width="500" height="500">O browser não suporta a <i>tag</i> HTML canvas.</canvas>
 
@@ -55,7 +55,7 @@ void main()
 <script src="../lib/stack.js"></script>
 <script src="../lib/HumanInput-master/humaninput-latest.min.js"></script>
 
-<script src="solar.js"></script>
+<script src="mesa.js"></script>
 
 <script>
 "use strict"
@@ -277,7 +277,7 @@ try
 		stack.reset();
 		let top = stack.top();
 
-		solar(prog, stack, state, primitive); 
+		mesa(prog, stack, state, primitive); 
 		requestAnimationFrame(animation);
 	};
 	requestAnimationFrame(animation);

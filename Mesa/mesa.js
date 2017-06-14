@@ -10,7 +10,7 @@ var colors = {
 	brown: [0.647059, 0.164706, 0.164706, 1.0]
 };
 
-function mesa(prog, stack, state, primitive)
+function mesa(prog, stack, primitive)
 {
 	let top = [];
 	

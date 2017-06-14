@@ -6,18 +6,21 @@
 </header>
 
 <body>
-	<h2>Básico para movimentação de câmera: <i>Scene Graph</i> - Mesa com Objetos</h2>
+	<h2>Básico para movimentação de câmera: <i>Scene Graph</i> - Mesa com Objetos <br></h2>
+	<h3><font color="blue">Danillo Lobo Ferraz <br>Marcos Antônio de Jesus Filho </font></h3>
+	
 	<p>Usando o teclado e o mouse para movimentação da câmera.</p>
+	<p>Aperte <b>H</b> para Ocultar/Visualizar a mensagem de Ajuda</p>
 	<canvas id="canvas-id" style="border:1px solid black;display:inline-block;" width="500" height="500">O browser não suporta a <i>tag</i> HTML canvas.</canvas>
-
 	<div id="help" style="display:inline-block; padding: 10px; vertical-align:top;">
                 <h2 style="text-align:center">Ajuda</h2>
                 <h3 style="text-align:center">Movimento da Câmera</h3>
                 <ul>
+
                  <li>w e arrowUP, s e arrowDown - move para frente ou para trás </li>
                  <li>d e arrowRight, a e arrowLeft - move para direira ou para a esquerda</li>
                  <li>PageUp ou PageDown - move para cima ou para baixo</li>
-                 <li>Insert ou Delete - Rotaciona em torno do eixo N</li>
+                 <li>q ou e - Rotaciona em torno do eixo N</li>
                  <li>Clique do mouse e movimento - rotaciona no plano UV</li>
                 </ul>
         </div>
@@ -99,14 +102,6 @@ function update_camera(camera, cam_message, vel, deltatime)
 				vec3.add(c.eye, c.eye, tmp);
 			break;
 
-			case "rotate_right":
-				let right = vec3.create();
-				vec3.cross(right, c.dir, c.up);
-				vec3.scale(tmp, right, vel.cam_linear*deltatime*cam_message.rotate_right);
-				vec3.add(c.eye, c.eye, tmp);
-			break;
-
-
 			case "rotate_forward":
 			    angle = glMatrix.toRadian(vel.cam_angular*deltatime*cam_message[i] / 2);
 			    tmp = [ Math.sin(angle)*c.dir[0],
@@ -127,6 +122,22 @@ function update_camera(camera, cam_message, vel, deltatime)
 			    vec3.normalize(c.dir, c.dir);
 			    cam_message[i] = 0;
 			break;
+
+			case "rotate_right":
+				let right = vec3.create();
+				vec3.cross(right, c.dir, c.up); //rotacionar em torno desse vetor
+				//quaternion ANGULO VETOR RIGHT
+				angle = glMatrix.toRadian(vel.cam_angular*deltatime*cam_message[i] / 2);
+				tmp = [ Math.sin(angle)*right[0],
+			    	    Math.sin(angle)*right[1], 
+			    	    Math.sin(angle)*right[2], 
+			    	    Math.cos(angle) ];
+			    vec3.transformQuat(c.dir, c.dir, tmp);
+			    vec3.normalize(c.dir, c.dir);
+			    cam_message[i] = 0;
+
+			break;
+
 		}
 	}
 }
@@ -180,11 +191,16 @@ try
 		camera_message.rotate_forward = event.type == "keydown" ? 1: 0;
 		return false;
 	});
+	HI.on(["keydown:q", "keyup:q"], function(event, key, code){
+		camera_message.rotate_forward = event.type == "keydown" ? -1: 0;
+		return false;
+	});
 	HI.on(["pan"], function(event, pan){
 		camera_message.rotate_up = -pan.xMoved;
 		camera_message.rotate_right = -pan.yMoved;
 		return false;
 	});
+
 	HI.on(["keyup:h"], function(event){
 		let help = document.getElementById("help");
 		if( showhelp ){
@@ -222,27 +238,15 @@ try
 	
 	let camera = 
 	{
-		eye: vec3.fromValues(0, 0, 6),
+		eye: vec3.fromValues(0, 0, 8),
 		dir: vec3.fromValues(0, 0, -1),
 		up: vec3.fromValues(0, 1, 0)
 	};
 	
-	let state = 
-	{
-		sol: 0,
-		trans_terra: 0,
-		rot_terra: 0,
-		rot_sat: 0,
-		rot_lua: 0
-	};
 
 	let vel = 
 	{
-		sol: 360/40.,
-		trans_terra: 360/50.,
-		rot_terra: 360/5.,
-		rot_sat: 360/.5,
-		rot_lua: 360/30,
+		
 		cam_linear: 4/5,
 		cam_angular: 360/10
 	};
@@ -258,11 +262,6 @@ try
 		
 		let i;
 		let speed = 1;
-		for (i in state) {
-			state[i] += speed * vel[i] * deltatime;
-			state[i] %= 360;
-		}
-
 		
 		gl.clear(gl.COLOR_BUFFER_BIT);
 		gl.clear(gl.DEPTH_BUFFER_BIT);
@@ -280,7 +279,7 @@ try
 		stack.reset();
 		let top = stack.top();
 
-		mesa(prog, stack, state, primitive); 
+		mesa(prog, stack, primitive); 
 		requestAnimationFrame(animation);
 	};
 	requestAnimationFrame(animation);

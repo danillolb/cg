@@ -16,7 +16,7 @@ function mesa(prog, stack, state, primitive)
 	
 	//a mesa tá rodando pra testar
 	top = stack.push();
-		mat4.rotateX(top, top, glMatrix.toRadian(state.sol));
+		mat4.rotateX(top, top, glMatrix.toRadian(0));
 		
 		// Base
 		top = stack.push();
@@ -32,9 +32,10 @@ function mesa(prog, stack, state, primitive)
 		// Perna 1
 		top = stack.push();
 			//metade da diagonal do quadrado a raiz de 2 sobre 2 , 
-			mat4.translate(top, top, [1.3, -1.5, 1.3]);
 			mat4.rotateX(top, top, glMatrix.toRadian(90));
 			mat4.scale(top, top, [.2 , .2, 1.5]);
+			mat4.translate(top, top, [6.5, 6.5, 1.067]);
+			
 			gl.uniformMatrix4fv(prog.model, false, top);
 			
 			gl.uniform4fv(prog.color, colors.brown);
@@ -45,9 +46,9 @@ function mesa(prog, stack, state, primitive)
 
 		// Perna 2
 		top = stack.push();
-			mat4.translate(top, top, [-1.3, -1.5, 1.3]);
-		    mat4.rotateX(top, top, glMatrix.toRadian(90));
+			mat4.rotateX(top, top, glMatrix.toRadian(90));
 			mat4.scale(top, top, [.2 , .2, 1.5]);
+			mat4.translate(top, top, [-6.5, 6.5, 1.067]);
 			gl.uniformMatrix4fv(prog.model, false, top);
 			
 			gl.uniform4fv(prog.color, colors.brown);
@@ -58,9 +59,9 @@ function mesa(prog, stack, state, primitive)
 
 		// Perna 3
 		top = stack.push();
-			mat4.translate(top, top, [1.3, -1.5, -1.3]);
-		    mat4.rotateX(top, top, glMatrix.toRadian(90));
+			mat4.rotateX(top, top, glMatrix.toRadian(90));
 			mat4.scale(top, top, [.2 , .2, 1.5]);
+			mat4.translate(top, top, [6.5, -6.5, 1.067]);
 			gl.uniformMatrix4fv(prog.model, false, top);
 			
 			gl.uniform4fv(prog.color, colors.brown);
@@ -71,9 +72,9 @@ function mesa(prog, stack, state, primitive)
 
 		// Perna 4
 		top = stack.push();
-			mat4.translate(top, top, [-1.3, -1.5, -1.3]);
-		    mat4.rotateX(top, top, glMatrix.toRadian(90));
+			mat4.rotateX(top, top, glMatrix.toRadian(90));
 			mat4.scale(top, top, [.2 , .2, 1.5]);
+			mat4.translate(top, top, [-6.5, -6.5, 1.067]);
 			gl.uniformMatrix4fv(prog.model, false, top);
 			
 			gl.uniform4fv(prog.color, colors.brown);
@@ -84,22 +85,24 @@ function mesa(prog, stack, state, primitive)
 
 		// OBJETO 1
 		top = stack.push();
-			mat4.translate(top, top, [0.4, .5, 0.3]);
+			mat4.scale(top, top, [.5 , .5, 0.5]);
 			mat4.rotateX(top, top, glMatrix.toRadian(-90));
-			mat4.scale(top, top, [.2 , .2, 0.5]);
+			
+			mat4.translate(top, top, [-1.5, -1.5, 1.21]);
 			gl.uniformMatrix4fv(prog.model, false, top);
 			
 			gl.uniform4fv(prog.color, colors.magent);
-			primitive.solid(primitive.hollow_cone);
+			primitive.solid(primitive.hollow_cylinder);
 			gl.uniform4fv(prog.color, colors.black);
-			primitive.wireframe(primitive.hollow_cone);	
+			primitive.wireframe(primitive.hollow_cylinder);	
 		top = stack.pop();
 
 		// OBJETO 2
 		top = stack.push();
-			mat4.translate(top, top, [-0.4, .5, 0.3]);
-			mat4.rotateX(top, top, glMatrix.toRadian(-90));
 			mat4.scale(top, top, [.4 , .4, 0.4]);
+			mat4.rotateX(top, top, glMatrix.toRadian(-90));
+						
+			mat4.translate(top, top, [-1.5, 1.5, 1.21]);			
 			gl.uniformMatrix4fv(prog.model, false, top);
 			
 			gl.uniform4fv(prog.color, colors.green);
@@ -110,9 +113,10 @@ function mesa(prog, stack, state, primitive)
 
 		// OBJETO 3
 		top = stack.push();
-			mat4.translate(top, top, [0.4, .5, -0.8]);
+			mat4.scale(top, top, [.4 , .4, 0.4]);
 			mat4.rotateX(top, top, glMatrix.toRadian(-90));
-			mat4.scale(top, top, [.4 , .4, 0.6]);
+			
+			mat4.translate(top, top, [1.5, 1.5, 1.21]);
 			gl.uniformMatrix4fv(prog.model, false, top);
 			
 			gl.uniform4fv(prog.color, colors.blue);

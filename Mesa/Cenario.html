@@ -68,7 +68,7 @@ function init_webgl(canvas)
 		throw Error("WebGL não é suportado pelo seu browser");
 		
 	gl.clearColor(0, 0, 0, 1);
-	
+	gl.enable(gl.DEPTH_TEST);
 	return gl;
 }
 
@@ -262,13 +262,16 @@ try
 			state[i] += speed * vel[i] * deltatime;
 			state[i] %= 360;
 		}
+
 		
 		gl.clear(gl.COLOR_BUFFER_BIT);
-
+		gl.clear(gl.DEPTH_BUFFER_BIT);
+		
 		gl.uniformMatrix4fv(prog.projection, false, proj);
 			
 
 		update_camera(camera, camera_message, vel, deltatime);
+
 		let center = vec3.create();
 		vec3.add(center, camera.eye, camera.dir);
 		mat4.lookAt(view, camera.eye, center, camera.up);
